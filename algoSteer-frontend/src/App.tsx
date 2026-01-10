@@ -1,20 +1,42 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { FocusProvider } from "./context/FocusContext";
+
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
 import Setup from "./pages/Setup";
+import Dashboard from "./pages/Dashboard";
 import OAuthRedirect from "./pages/OAuthRedirect";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-const App = () => {
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/setup" element={<Setup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/redirect" element={<OAuthRedirect />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
+    <AuthProvider>
+      <FocusProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/redirect" element={<OAuthRedirect />} />
 
-export default App;
+            <Route
+              path="/setup"
+              element={
+                <ProtectedRoute>
+                  <Setup />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </FocusProvider>
+    </AuthProvider>
+  );
+}
