@@ -7,7 +7,7 @@ import connectDB from "./config/db";
 
 dotenv.config();
 connectDB();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 const app = express();
 app.use(cors());
@@ -16,5 +16,6 @@ app.use(express.json());
 // Routes (We will create these next)
 app.use("/api/auth", authRouter);
 app.use("/api/youtube", youtubeRoute);
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
