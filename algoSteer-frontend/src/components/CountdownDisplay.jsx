@@ -1,45 +1,37 @@
-import React from 'react';
-import { Clock, ExternalLink } from 'lucide-react';
+import React from "react";
+import { Zap, Clock, ExternalLink } from "lucide-react";
 
 export default function CountdownDisplay({ session }) {
-  const calculateRemaining = () => {
-    const start = new Date(session.startDate);
-    const end = new Date(start);
-    end.setDate(start.getDate() + session.totalDays);
-    const diff = end - new Date();
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  };
+  const daysLeft = Math.max(0, Math.ceil((new Date(session.startDate).getTime() + session.totalDays * 86400000 - Date.now()) / 86400000));
+  
+  const lastPulse = session.lastSync ? new Date(session.lastSync).toLocaleTimeString() : "Pending...";
 
   return (
-    <div className="bg-gradient-to-br from-red-900/20 to-black p-10 rounded-3xl border border-red-500/30">
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <p className="text-red-500 uppercase tracking-widest text-sm font-bold">Active Focus</p>
-          <h2 className="text-4xl font-black mt-2">{session.activeTopic}</h2>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="bg-gradient-to-br from-red-600/20 to-black border border-white/10 p-10 rounded-[2rem]">
+        <div className="flex items-center gap-2 mb-4 text-yellow-500">
+          <Zap size={16} fill="currentColor" className="animate-pulse" />
+          <span className="text-xs font-bold uppercase tracking-widest">Pulse Engine Active</span>
         </div>
-        <div className="bg-red-600 p-3 rounded-2xl">
-          <Clock size={32} />
-        </div>
-      </div>
+        
+        <h2 className="text-5xl font-black mb-2">{session.activeTopic}</h2>
+        <p className="text-gray-500 mb-8">Home feed is being forcefully rewired every 10 minutes.</p>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="bg-white/5 p-4 rounded-xl">
-          <p className="text-gray-400 text-xs uppercase">Time Remaining</p>
-          <p className="text-2xl font-bold">{calculateRemaining()} Days</p>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+            <p className="text-gray-500 text-xs uppercase mb-1">Duration Left</p>
+            <p className="text-3xl font-bold">{daysLeft} Days</p>
+          </div>
+          <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+            <p className="text-gray-500 text-xs uppercase mb-1">Last Algo-Inject</p>
+            <p className="text-3xl font-bold">{lastPulse}</p>
+          </div>
         </div>
-        <div className="bg-white/5 p-4 rounded-xl">
-          <p className="text-gray-400 text-xs uppercase">Target Platform</p>
-          <p className="text-2xl font-bold">YouTube</p>
-        </div>
-      </div>
 
-      <a 
-        href="https://www.youtube.com" 
-        target="_blank" 
-        className="flex items-center justify-center gap-2 w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition"
-      >
-        Go to Curated Feed <ExternalLink size={18} />
-      </a>
+        <a href="https://youtube.com" target="_blank" className="w-full bg-white text-black py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-200 transition">
+          View My New Feed <ExternalLink size={18} />
+        </a>
+      </div>
     </div>
   );
 }

@@ -25,48 +25,57 @@ export const googleAuth = async (req: Request, res: Response) => {
   res.redirect(url);
 };
 
-// Callback route after user logs in
 export const googleCallback = async (req: Request, res: Response) => {
   const { code } = req.query;
-  if (!code) {
-    return res.status(400).send("No code provided by Google");
-  }
+  if (!code) return res.status(400).send("No code provided");
 
   try {
     const { tokens } = await oAuth2Client.getToken(code as string);
-    const frontendUrl = `http://localhost:5173/dashboard?token=${tokens.access_token}`;
-    res.redirect(frontendUrl);
+    oAuth2Client.setCredentials(tokens);
 
-    // oAuth2Client.setCredentials(tokens); // for the testing
+    const oAuth2 = google.oauth2({ version: "v2", auth: oAuth2Client });
+    const userInfo = await oAuth2.userinfo.get();
+    const email = userInfo.data.email;
 
-    res.json({
-      message: "Login Suceed",
-      tokens,
-    });
+    await userModel.findOneAndUpdate(
+      { email },
+      {
+        email,
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token, // Saved for the 10-min pulse
+      },
+      { upsert: true }
+    );
+
+    // ✅ Only ONE response: The Redirect
+    const frontendUrl = `http://localhost:5173/dashboard?token=${tokens.access_token}&email=${email}`;
+    return res.redirect(frontendUrl);
   } catch (error) {
-    console.error("Error exchanging code: ", error);
-    res.redirect("http://localhost:5173/login?error=auth_failed");
+    console.error("Auth Error:", error);
+    return res.redirect("http://localhost:5173/?error=auth_failed");
   }
 };
 
-//get  useer status
+// GET STATUS - Added param handling for the dashboard fetch
 export const getUserStatus = async (req: Request, res: Response) => {
-  const { email } = req.query;
   try {
+    const { email } = req.params;
     const user = await userModel.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found!",
-      });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.status(200).json({
-      isSteeringActive: user.isSteeringActive,
-      activeTopic: user.activeTopic,
-      startDate: user.startDate,
-      totalDays: user.totalDays,
-    });
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+// STOP STEERING - To kill the pulse engine
+export const stopSteer = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    await userModel.findOneAndUpdate({ email }, { isSteeringActive: false });
+    res.json({ success: true, message: "Pulse engine stopped." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to stop" });
   }
 };

@@ -1,15 +1,19 @@
 import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema({
- email: { type: String, required: true, unique: true },
-  refreshToken: String, // CRITICAL for background tasks
-  activeTopic: String,
-  totalDays: Number,
-  startDate: Date,
-  isSteeringActive: { type: Boolean, default: false },
-  lastInjectedAt: { type: Date, default: Date.now }
+const SteeringSchema = new mongoose.Schema({
+  topic: { type: String, required: true },
+  totalDays: { type: Number, default: 7 },
+  startDate: { type: Date, default: Date.now },
+  lastSync: { type: Date, default: Date.now },
+  isActive: { type: Boolean, default: true }
 });
 
-const userModel = mongoose.model("User", UserSchema);
+const UserSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  accessToken: String,
+  refreshToken: String,
+  // 🔥 Support for multiple steerings
+  steerings: [SteeringSchema]
+});
 
-export default userModel;
+export default mongoose.model("User", UserSchema);
