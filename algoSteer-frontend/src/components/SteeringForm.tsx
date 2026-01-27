@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import axios from "axios";
 import { Loader2, Target, Calendar, ArrowRight } from "lucide-react";
 
-export default function SteeringForm({ email, onRefresh }) {
+export default function SteeringForm({ email, onRefresh }: any) {
   const [topic, setTopic] = useState("");
   const [days, setDays] = useState(7);
   const [loading, setLoading] = useState(false);
@@ -76,6 +76,7 @@ export default function SteeringForm({ email, onRefresh }) {
               type="number"
               className="w-full bg-black border border-white/5 rounded-2xl p-4 text-white focus:border-red-600 focus:ring-1 focus:ring-red-600 outline-none transition-all"
               value={days}
+              //@ts-ignore
               onChange={(e) => setDays(e.target.value)}
               min="1"
               required

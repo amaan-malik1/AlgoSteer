@@ -1,7 +1,6 @@
-import React from "react";
 import { Trash2, Clock, Activity } from "lucide-react";
 
-export default function SteeringCard({ steer, onDelete }) {
+export default function SteeringCard({ steer, onDelete }:any) {
   const lastPulse = steer.lastSync 
     ? new Date(steer.lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
     : "Initializing...";

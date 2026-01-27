@@ -1,4 +1,3 @@
-import React from 'react';
 import { Youtube, Zap } from 'lucide-react';
 
 export default function LoginScreen() {
